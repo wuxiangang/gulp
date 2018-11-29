@@ -1,0 +1,368 @@
+<html lang="utf-8">
+
+<head>
+	<meta charset="utf-8">
+	<meta name=viewport content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+	<meta name="renderer" content="webkit">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/toast.css">
+</head>
+
+<body>
+	<div class="container otc-list">
+		<div class="order-detail">
+			<div class="header-status">
+				<h2 class="status color_pramary"></h2>
+				<!-- <div class="f-middle" id="going_pay"><span>请于</span><span class="color_red"><i id="minite"></i>分<i id="second"></i>秒</span><span>内支付</div> -->
+			</div>
+			<section>
+				<ul class="pay-list">
+				</ul>
+			</section>
+			<div class="f-middle cankao"><span>付款参考号：</span> <span class="pay-id otc_transac_cn"></span></div>
+			<ul class="order-list">
+				<!-- <li>
+					<span>商家</span>
+					<div><span class="otc_ader_name"></span></div>
+				</li>
+				<li>
+					<span>数量</span>
+					<div><span class="num-str otc_transac_amount"></span> <span class="coin_name"></span></div>
+				</li>
+				<li>
+					<span>单价</span>
+					<div><span class="prize-single unin_price"></span> <span class="currency_name"></span></div>
+				</li> -->
+				<li>
+					<span>总价</span>
+					<div><span class="prize-total total_price"></span> <span class="currency_name"></span></div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<section class="order-detail success-hide">
+		<div class="o-f-hidden status1"><button class="btn opacity f-fl" id="tell_btn" type="button" style="color: #10996d;background: #f2f6fb; width: 100%">提醒付款</button></div>
+		<div class="o-f-hidden status1"><button class="btn opacity f-fl" id="btn_cancer" type="button">取消订单</button></div>
+		<div class="o-f-hidden status2" style="margin-bottom: 6px;">
+			<button style="width: 97%; margin: 0 auto;" class="btn" id="btn_pay" type="button">确认收款并放币</button>
+		</div>
+		<div class="o-f-hidden status3 color_red">交易已取消</div>
+		<div class="o-f-hidden status4 color_pramary">交易已冻结</div>
+		<div class="o-f-hidden status5 color_pramary">交易已完成</div>
+	</section>
+
+	<div class="wrapper">
+		<div id="qrcode">
+			<i class="close-btn"></i>
+			<img src="" />
+		</div>
+
+		<div id="modalSell" class="modal">
+			<i class="close-btn"></i>
+			<h3>确认收款并放币</h3>
+			<div class="content">我已线下确认已收到对方支付款项，且金额确认无误！</div>
+			<div class="btn-line">
+				<button type="button" class="btn small" id="dopay">确定</button>
+				<button type="button" class="btn default small" id="cancer">取消</button>
+			</div>
+		</div>
+
+		<div id="modalCancer" class="modal">
+			<i class="close-btn"></i>
+			<h3 class="color_red">订单取消</h3>
+			<div class="content">
+				<p class="f-small">
+					<label>
+						<span>确认取消订单？</span>
+					</label>
+				</p>
+				<!-- <p class="f-14">取消规则：<span>买方24小时内累计3笔取消，<span class="color_red">将会限制24小时内的买入</span>功能。</span></p> -->
+			</div>
+			<div class="btn-line">
+				<button type="button" class="btn small" id="docancer">确定取消</button>
+				<button type="button" class="btn default small" id="cancer">我再想想</button>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+			var session = GLOBAL.query('otc_ader_id'); // 临时会话
+			var return_url = GLOBAL.query('return_url');
+			var otc_transac_id = GLOBAL.query('otc_transac_id'); //广告主订单号
+			var order_number = GLOBAL.query('order_number');
+			var payment = {
+				accountinfo: {}
+			};
+			var payList = [];
+			var status, chatDisabled;
+			if (session) GLOBAL.setCookie('session', session);
+
+			$('#btn_pay').on('click', function (e) {
+				$('.wrapper').show();
+				$('#modalSell').show();
+			});
+
+			$('#qrcode,#modalSell,#modalCancer').on('click', function (e) {
+				e.stopPropagation();
+			});
+
+			$('#cancer,.close-btn').on('click', function (e) {
+				hideWrappers();
+			});
+
+			var timer, timer2;
+			$('#tell_btn').on('click', function () {
+				if (chatDisabled) return;
+				chatDisabled = true;
+				var n = 3,
+					ele = $(this);
+				GLOBAL.ajax({
+					url: '/api/v1/web/otc_transac/id/' + otc_transac_id + '/otc_transac_chat?order_number=' + order_number,
+					method: 'post',
+					data: {
+						chant_body: "请及时付款"
+					},
+					success: function (data) {
+						ele.attr('disabled', true);
+						ele.text(n + 's后重试');
+						timer = setInterval(function () {
+							if (n < 2) {
+								n = 3;
+								chatDisabled = false;
+								ele.text('提醒付款');
+								ele.attr('disabled', false);
+								clearInterval(timer);
+								return;
+							}
+							n--;
+							ele.text(n + 's后重试');
+						}, 1000);
+						GLOBAL.Message.success('已通知买家付款');
+					}
+				})
+			});
+
+			$('#dopay').on('click', function () {
+				finish();
+			});
+
+			$('#btn_cancer').on('click', function (e) {
+				$('.wrapper').show();
+				$('#modalCancer').show();
+			});
+
+
+			$('#docancer').on('click', function () {
+				cancerOrder();
+			});
+
+
+			GLOBAL.loading.show();
+			getOrder();
+
+			function otc_transac_status_2() {
+				$('.status1').hide();
+				$('.status2').show();
+				$('.status').text('已付款');
+			}
+
+			function otc_transac_status_3(s) {
+				var text;
+				switch(s) {
+					case 3:
+						text = '已取消';
+						break;
+					case 8:
+						text = '已超时';
+						break;
+					case 7:
+						text = '客服取消';
+						break;
+				}
+				$('.status1').hide();
+				$('.status2').hide();
+				$('.status3').show();
+				$('.status').text(text);
+			}
+
+			function otc_transac_status_4() {
+				$('.status1').hide();
+				$('.status2').hide();
+				$('.status4').show();
+				$('.status').text('已冻结');
+			}
+
+			function otc_transac_status_5(s) {
+				var text = s !== 6 ? '已完成' : '客服完成';
+				$('.status2').hide();
+				$('.status5').show();
+				$('.status').text(text);
+				if (return_url) location.href = return_url;
+			}
+
+			function hideWrappers() {
+				$('.wrapper').hide();
+				$('.wrapper > div').hide();
+			}
+
+			function cancerOrder() {
+				GLOBAL.ajax({
+					url: '/web/view/otc_ader/id/' + otc_transac_id + '/_cancel?order_number=' + order_number,
+					method: 'post',
+					success: function (data) {
+						location.href = 'otc_selector.html?order_number=' + order_number
+						hideWrappers();
+						otc_transac_status_3();
+					}
+				})
+			}
+
+			function finish() {
+				GLOBAL.ajax({
+					url: '/web/view/otc_ader/id/' + otc_transac_id + '/_finish?order_number=' + order_number,
+					method: 'post',
+					success: function (data) {
+						hideWrappers();
+						otc_transac_status_5();
+					}
+				})
+			}
+
+			function showList(data) {
+				var fragment = document.createDocumentFragment();
+				var li = document.createElement('li');
+				$('.pay-list').html('');
+				for (key in data) {
+					data[key].forEach(function (v, i) {
+						var cls, pay_name, pay_id, account, last;
+						switch (key) {
+							case 'alipay':
+								cls = 'aly-pay';
+								pay_name = '支付宝';
+								pay_id = v.user_account_alipay_id;
+								account = v.alipay_account_name;
+								last = v.alipay_qrcode ? '<img class="qrcode" data-src=' + v.alipay_qrcode + ' src="image/erweima.png" />' : ''
+								break;
+							case 'wechat':
+								cls = 'wx-pay';
+								pay_name = '微信支付';
+								pay_id = v.user_account_wechatpay_id;
+								account = v.wechatpay_account;
+								last = v.wechatpay_qrcode ? '<img class="qrcode" data-src=' + v.wechatpay_qrcode + ' src="image/erweima.png" />' : ''
+								break;
+							case 'bank':
+								cls = 'yh-pay';
+								pay_name = '银行卡';
+								pay_id = v.user_account_bank_id;
+								account = v.bank_code;
+								last = v.bank_name + v.bank_branch;
+								break;
+							default:
+								cls = 'pay-pay';
+								pay_name = 'PayPal'
+								pay_id = v.user_account_paypal_id;
+								account = v.paypal_account;
+								last = '';
+						}
+						var li_clone = $(li).clone()
+						li_clone.html('<div class="label"><label>' +
+							'<input type="radio" name="payment" value=' + i + ' id="" class="a-radio">' +
+							'<span class="b-radio"></span></label>' +
+							'<div class="pay-way-box"><i class="icon ' + cls + '"></i>' +
+							'<span class="pay-way">' + pay_name + '</span></div>' +
+							(key === 'bank' ? '<div class="bank"><div><div class="bottom-line">' : '') +
+							'<span class="pay-name">' + v.account_name + '</span>' +
+							'<span class="pay-tel">' + account + '</span>' +
+							(key === 'bank' ? '</div>' : '') +
+							'<span >' + last + '</span>' +
+							(key === 'bank' ? '</div></div>' : '') +
+							'</div>'
+						)
+						$(fragment).append(li_clone);
+					})
+				}
+				$('.pay-list').append($(fragment));
+
+				// 二维码绑定事件
+				setTimeout(function () {
+					$('.qrcode').on('click', function (e) {
+						e.stopPropagation();
+						$('.wrapper').show();
+						$('#qrcode').show();
+						$('#qrcode img').attr('src', this.dataset.src);
+					});
+
+					$('.wrapper').on('click', function (e) {
+						hideWrappers()
+					});
+
+					var elem = $("input:radio").eq(0);
+					elem.attr("checked", true);
+					$('.b-radio').addClass('disabled');
+				}, 0);
+			}
+
+			function getOrder(updata) {
+
+				GLOBAL.ajax({
+					url: '/web/view/otc_ader/order/' + order_number,
+					method: 'get',
+					success: function (data) {
+						GLOBAL.loading.hide();
+						if (!status || updata) {
+							var parmas = [
+								'otc_ader_name', 'otc_transac_amount',
+								'coin_name', 'otc_transac_cn', 'unin_price'
+							];
+							document.title = '订单完成-' + data.otc_transac_cn;
+							parmas.forEach(function (v, i) {
+								$('.' + v).text(data[v]);
+							});
+							$('.total_price').text(Number(data.otc_transac_amount * data.unin_price).toFixed(2));
+							$('.currency_name').text('CNY')
+						}
+
+						if (!status || data.otc_transac_status !== status) showList(data.account_info);
+						if (!data.account_info) {
+							$('.pay-list').hide()
+						}
+						// data.otc_transac_status = 4
+						switch (data.otc_transac_status) {
+							case 1:
+								if (status !== 1) showList(data.account_info);
+								clearTimeout(timer2);
+								$('.status1').show();
+								$('.status').text('等待付款');
+								timer2 = setTimeout(getOrder, 3000)
+								break;
+							case 2:
+								clearTimeout(timer2);
+								otc_transac_status_2();
+								break;
+							case 3:
+							case 7:
+							case 8:
+								otc_transac_status_3(data.otc_transac_status);
+								break;
+							case 4:
+								otc_transac_status_4();
+								break;
+							case 5:
+							case 6:
+								showList(data.account_info);
+								otc_transac_status_5(data.otc_transac_status);
+						}
+						status = data.otc_transac_status;
+					}
+				});
+			}
+		})
+	</script>
+	<script type="text/javascript" src="js/interceptor.js"></script>
+</body>
+
+</html>

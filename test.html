@@ -1,0 +1,167 @@
+<html lang="utf-8">
+<head>
+	<meta charset="utf-8">
+    <meta name=viewport content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="renderer" content="webkit">
+    <title>OTC交易演示</title>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/toast.css">
+	<style>
+		body {
+			background: #f5f5f5;
+		}
+		p{text-align: center;margin-top: 50px;}
+		div.test {
+			position: absolute;
+			width: 500px;
+			height: 658px;
+			top: 50%;
+			left: 50%;
+			margin: -329px 0 0 -250px;
+			background: #eee;
+			border-radius: 5px;
+			box-shadow: 0 1px 12px 0 rgba(0,0,0,.5);
+			overflow: hidden;
+			display: block!important;
+		}
+		.input-box {
+			padding-top: 20px;
+			text-align: left
+		}
+
+		.input-box input {
+			padding: 0 20px;
+			height: 36px;
+			width: 300px;
+			vertical-align: middle;
+		}
+
+		.input-box button {
+			margin-top: 10px;
+			text-align: center;
+		    font-size: 14px;
+		    height: 40px;
+		    width: 380px;
+		    line-height: 40px;
+		    background-color: #638bd4;
+		    color: #fff;
+		    border: 1px solid #638bd4;
+		}
+
+		.coin {
+			padding: 8px 16px;
+			background-color: #f5f8fd;
+		    text-align: center;
+		    font-size: 14px;
+		    height: 30px;
+		    line-height: 30px;
+		    border: 1px solid #dcdee2;
+		    cursor: pointer;
+		}
+
+		.coin.active {
+			border-color: red;
+		}
+	</style>
+</head>
+<body>
+
+	<div style="margin: 0 auto;width: 500px;background-color: white;box-shadow: 0 0 10px rgba(0,0,0,.1);padding: 20px 40px 20px 180px;margin-top: 100px;">
+		<div class="input-box">
+			<span>币种</span>&nbsp;&nbsp;
+			<a class="coin">ETH</a>
+			<a class="coin">BTC</a>
+			<a class="coin">USDT</a>
+		</div>
+		<div class="input-box">
+			<span>数量</span>&nbsp;&nbsp;
+			<input type="number" id="mount" placeholder="请输入数量" />
+		</div>
+		<div class="input-box">
+			<button onclick="createOrder('pay')">OTC充值</button>
+			<button onclick="createOrder('refund')">OTC提现</button>
+		</div>
+	</div>
+ 	<div class="wrapper">
+		<div class="test">
+			<header style="background: #fff;padding: 20px 20px 10px;border-bottom: 1px solid #eee;height: 28px"></header>
+			<i class="close-btn"></i>
+			<iframe style="border: 0;width: 100%;height: 600px" src=""></iframe>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		var iframe = document.getElementsByTagName('iframe')[0];
+		function create(order) {
+			if (!order) return;
+			iframe.setAttribute('src', 'otc_selector.html?order_number='+order)
+		}
+
+		var coin_name = null,
+			mount = null;
+
+		$('.coin').on('click', function(e) {
+			$('.coin').removeClass('active');
+			$(this).addClass('active');
+			coin_name = $(this).html();
+		});
+
+		$('#mount').on('input', function(e) {
+			mount = $(this).val();
+			var arr = mount.split('.');
+			if (arr[1]) {
+				if (arr[1].length > 8) {
+					$(this).val(arr[0]+'.'+arr[1].substr(0,8));
+				}
+			}
+		});
+
+		$('.close-btn').on('click', function() {
+			$('.wrapper').hide();
+		})
+
+
+		var parmas = {
+			  "return_url": "tset",
+			  "notify_url": "test",
+			  "access_key": "xu2I7vMfaqDfLm5n9uHXkp1zjWu8t1IQM9H4HUkeiEwBA8DF4Jft41E4Dt8mFEpp3WMTU9944J2X2K48TACjUtaOKdi38JOgCSjiiQ6H8Gew2iz5zy83P9U4",
+			  "coin_name": "BTC",
+			  "amount": "1",
+			  "currency": "0",
+			  "merchant_order_id": "",
+			  "rand": "",
+			  "sign": ""
+		}
+
+		function createOrder(name) {
+			var patrn = /^\d+(\.\d+)?$/;
+			if (!coin_name) return GLOBAL.Message.error('请选择币种');
+			if (!patrn.test(mount)) return GLOBAL.Message.error('请输入数字');
+			if (!mount) return GLOBAL.Message.error('请输入数量');
+			if (mount <= 0 ) return GLOBAL.Message.error('数量必须大于0');
+
+			parmas.coin_name = coin_name;
+			parmas.amount = mount;
+
+			GLOBAL.ajax({
+				url: '/web/api/'+name,
+				method: 'post',
+				data: parmas,
+				success: function(data) {
+					create(data.order_number);
+					setTimeout(function() {
+						$('.wrapper').show();
+					}, 200);
+				}
+			})
+		}
+
+	</script>
+	<script type="text/javascript" src="js/interceptor.js"></script>
+<style type="text/css">
+</style>
+
+</body>
+</html>

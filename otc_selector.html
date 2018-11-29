@@ -1,0 +1,502 @@
+<html lang="utf-8">
+
+<head>
+	<meta charset="utf-8">
+	<meta name=viewport content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+	<meta name="renderer" content="webkit">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/paging.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/toast.css">
+</head>
+
+<body>
+	<div class="container">
+		<h2 style="display: inline-block;"><span class="type"></span>款方式</h2> <span class="coinNum"></span>
+		<div class="content">
+			<div class="selector">
+				<ul class="o-f-hidden flex flex-between">
+					<li class="box-sizing flex-item" data-payment="alipay">
+						<i class="icon aly-pay"></i>
+						<span>支付宝</span>
+					</li>
+					<li class="box-sizing flex-item" data-payment="wechat">
+						<i class="icon wx-pay"></i>
+						<span>微信</span>
+					</li>
+					<li class="box-sizing flex-item" data-payment="bank">
+						<i class="icon yh-pay"></i>
+						<span>银行卡</span>
+					</li>
+					<!-- <li class="box-sizing flex-item" data-payment="paypal">
+						<i class="icon pay-pay"></i>
+						<span>PayPal</span>
+					</li> -->
+				</ul>
+			</div>
+			<div class="content-wrapper">
+				<div class="blackP"></div>
+				<ul id="list">
+				</ul>
+				<div id="page" class="page_div"></div>
+				<div id="background-block">
+					<div class="backgrounder"></div>
+					<p>请选择您的<span class="type"></span>款方式，开启交易<span class="type2"></span></p>
+				</div>
+				<div id="nodata-block">
+					<div class="nodata-backgrounder"></div>
+					<p>暂无广告推荐</p>
+					<p>选择其他支付方式试试</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="wrapper">
+		<div class="pay-popver">
+			<i class="close-btn"></i>
+			<div class="title">添加收款方式</div>
+			<div class="alipay-box alipayform">
+				<form id="alipayform">
+					<div>
+						<p class="input-label">姓名</p>
+						<div class="input-line"><input type="text" class="account_name" name="account_name" /></div>
+					</div>
+					<div>
+						<p class="input-label">支付宝账号</p>
+						<div class="input-line"><input type="text" class="alipay_account_name" name="alipay_account_name" /></div>
+					</div>
+					<div>
+						<p class="input-label">二维码</p>
+						<div class="ewm-box">
+							<label>
+								<p class="alipay_file first-text">请上传您的收款二维码图片(.jpg/.png)</p>
+								<p class="alipay_file sec-text">点击可更换或编辑二维码</p>
+								<input type="file" class="file" id="alipay_files" accept="image/jpg, image/jpeg, image/png" name="alipay_qrcode" />
+							</label>
+							<div>
+								<img id="alipay_img" src="" />
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="alipay-box wechatform">
+				<form id="wechatform">
+					<div>
+						<p class="input-label">姓名</p>
+						<div class="input-line"><input type="text" class="account_name" name="account_name" /></div>
+					</div>
+					<div>
+						<p class="input-label">微信账号</p>
+						<div class="input-line"><input type="text" class="wechatpay_account" name="wechatpay_account" /></div>
+					</div>
+					<div>
+						<p class="input-label">二维码</p>
+						<div class="ewm-box">
+							<label>
+								<p class="wechat_file first-text">请上传您的收款二维码图片(.jpg/.png)</p>
+								<p class="wechat_file sec-text">点击可更换或编辑二维码</p>
+								<input type="file" class="file" id="wechat_files" accept="image/jpg, image/jpeg, image/png" name="wechatpay_qrcode" />
+							</label>
+							<div>
+								<img id="wechat_img" src="" />
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="alipay-box paypalform">
+				<form id="paypalform">
+					<div>
+						<p class="input-label">姓名</p>
+						<div class="input-line"><input type="text" class="account_name" name="account_name" /></div>
+					</div>
+					<div>
+						<p class="input-label">paypal账号</p>
+						<div class="input-line"><input type="text" class="paypal_account" name="paypal_account" /></div>
+					</div>
+				</form>
+			</div>
+
+			<div class="alipay-box bankform">
+				<form id="bankform">
+					<div>
+						<p class="input-label">姓名</p>
+						<div class="input-line"><input type="text" class="account_name" name="account_name" /></div>
+					</div>
+					<div>
+						<p class="input-label">开户银行</p>
+						<div class="input-line"><input type="text" class="bank_name" name="bank_name" /></div>
+					</div>
+					<div>
+						<p class="input-label">开户支行</p>
+						<div class="input-line"><input type="text" class="bank_branch" name="bank_branch" /></div>
+					</div>
+					<div>
+						<p class="input-label">银行卡账号</p>
+						<div class="input-line"><input type="text" class="bank_code" name="bank_code" /></div>
+					</div>
+				</form>
+			</div>
+
+			<div class="btn-liner">
+				<button type="button" id="sure_btn" class="btn pramary">确定</button>
+				<button type="button" id="cancel-wrap" class="btn default">取消</button>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+
+
+
+			var order_number = GLOBAL.query('order_number');
+			var payInfo = JSON.parse(GLOBAL.query('payment'));
+
+			var ReturnUrl;
+			var items = [];
+			var OrderType, CoinName, otc_ad_id, formName, file_path, single_price, payment, Amount, otc_ad_account_type;
+			var timer_price;
+			var page = 1;
+			var pageSize = 4;
+
+			function hideWrap() {
+				$('.wrapper').hide();
+				$('.alipayform, .wechatform, .bankform, .paypalform').hide();
+			}
+
+			function clearForm() {
+				var form = $('#' + formName);
+				$('#' + formName).find('.first-text').show();
+				$('#' + formName).find('img').attr('src', '');
+				$('#' + formName).find('img, .sec-text').hide();
+				form[0].reset();
+				file_path = null;
+				var file = form.find('.file');
+				if (!file.length) return;
+				file[0].setAttribute('type', 'text')
+				file[0].setAttribute('type', 'file')
+			}
+
+			$('.close-btn, #cancel-wrap').on('click', function (e) {
+				hideWrap();
+				clearForm();
+			});
+
+			function trimSide(str) {
+				return str.replace(/(^\s*)|(\s*$)/g, "");
+			}
+
+			$('#sure_btn').on('click', function () {
+				var form = $('#' + formName);
+				var accountinfo;
+				switch (formName) {
+					case 'wechatform':
+						var account_name = form.find('.account_name').val();
+						account_name = trimSide(account_name);
+						var wechatpay_account = trimSide(form.find('.wechatpay_account').val());
+						if (!account_name) return GLOBAL.Message.error('请输入姓名');
+						if (!wechatpay_account) return GLOBAL.Message.error('请输入微信账号');
+						if (!file_path) return GLOBAL.Message.error('请上传微信二维码');
+						accountinfo = {
+							wechat: [{
+								account_name,
+								wechatpay_account: wechatpay_account,
+								wechatpay_qrcode: file_path
+							}]
+						};
+						break;
+					case 'alipayform':
+						var account_name = trimSide(form.find('.account_name').val());
+						var alipay_account_name = trimSide(form.find('.alipay_account_name').val());
+						if (!account_name) return GLOBAL.Message.error('请输入姓名');
+						if (!alipay_account_name) return GLOBAL.Message.error('请输入支付宝账号');
+						// if (!file_path) return GLOBAL.Message.error('请上传支付宝二维码');
+						accountinfo = {
+							alipay: [{
+								account_name,
+								alipay_account_name: alipay_account_name,
+								alipay_qrcode: file_path
+							}]
+						};
+						break;
+					case 'bankform':
+						var account_name = trimSide(form.find('.account_name').val());
+						var bank_name = trimSide(form.find('.bank_name').val());
+						var bank_branch = trimSide(form.find('.bank_branch').val());
+						var bank_code = trimSide(form.find('.bank_code').val());
+						if (!account_name) return GLOBAL.Message.error('请输入姓名');
+						if (!bank_name) return GLOBAL.Message.error('请输入开户银行');
+						if (!bank_branch) return GLOBAL.Message.error('请输入银行支行');
+						if (!bank_code) return GLOBAL.Message.error('请输入银行卡账号');
+						accountinfo = {
+							bank: [{
+								account_name,
+								bank_name: bank_name,
+								bank_branch: bank_branch,
+								bank_code: bank_code
+							}]
+						};
+						break;
+					case 'paypalform':
+						var account_name = trimSide(form.find('.account_name').val());
+						var paypal_account = trimSide(form.find('.paypal_account').val());
+						if (!account_name) return GLOBAL.Message.error('请输入姓名');
+						if (!paypal_account) return GLOBAL.Message.error('请输入paypal账号');
+						accountinfo = {
+							paypal: [{
+								account_name,
+								paypal_account: paypal_account,
+							}]
+						};
+						break;
+				}
+
+				createOrder(accountinfo, function (data) {
+					hideWrap();
+					clearForm();
+				})
+			});
+
+			$('#alipay_files, #wechat_files').on('change', function (e) {
+				var type = this.files[0].name.slice(-3);
+				if (type !== 'png' && type !== 'jpg' && type !== 'jpeg') {
+					return GLOBAL.Message.error('图片格式不正确');
+				}
+				const formdata = new FormData();
+				formdata.append('file', this.files[0]);
+				GLOBAL.files(formdata, function (data) {
+					var file_base = image_url;
+					if (data.file_path) {
+						file_path = file_base + data.file_path;
+						$('#' + formName).find('.first-text').hide();
+						$('#' + formName).find('img').attr('src', file_path);
+						$('#' + formName).find('img, .sec-text').show();
+					}
+				})
+			})
+
+			$('li').on('click', function (e) {
+				otc_ad_account_type = $(this).index() + 1;
+				var current = this.dataset.payment;
+				if (current === payment) return;
+				$('li').removeClass('active');
+				$(this).addClass('active');
+
+				formName = current + 'form';
+				payment = current;
+				ajax2('?' + current + '=2');
+			});
+
+			function getOrder() {
+				if (!order_number) return GLOBAL.Message.error('缺少订单号');
+				GLOBAL.ajax({
+					url: '/web/view/order/' + order_number,
+					method: 'get',
+					success: function (data) {
+						OrderType = data.OrderType;
+						CoinName = data.CoinName;
+						Amount = data.Amount;
+						ReturnUrl = data.ReturnUrl;
+						getCoin(CoinName);
+						if (data.OrderType === 1) {
+							$('.type').html('付');
+							$('.type2').html('购买');
+							$('.coinNum').hide()
+
+							// 默认选中银行
+							// payment = 'bank';
+							// $('.selector li').eq(2).addClass('active');
+							// ajax2('?bank=2');
+						} else {
+							$('.type').html('收');
+							$('.type2').html('出售');
+							//数量: 10100 ETH
+							$('.coinNum').text('(数量: ' + data.Amount + ' ' + data.CoinName + ')')
+							$('.coinNum').show()
+						}
+					}
+				})
+			}
+
+			function getCoin(CoinName, success) {
+				GLOBAL.ajax({
+					url: '/api/v1/web/coin/price',
+					method: 'get',
+					success: function (data) {
+						GLOBAL.loading.hide();
+						success && success(data);
+						single_price = data[CoinName];
+					}
+				})
+			}
+
+			function createOrder(accountinfo, success) {
+				var data = {
+					order_number: order_number,
+					otc_ad_id: otc_ad_id
+				};
+				if (accountinfo) data.accountinfo = accountinfo;
+				GLOBAL.ajax({
+					url: '/web/view/otc_ader/',
+					data: data,
+					method: 'post',
+					success: function (data) {
+						success && success(data);
+						var url = OrderType === 1 ? 'otc_buy.html' : 'otc_sell.html'
+						console.log(url + '?otc_ader_id=' + data.otc_ader_id + '&otc_transac_id=' + data.otc_transac_id +
+							'&order_number=' + order_number + '&otc_ad_account_type=' + otc_ad_account_type+'&return_url='+encodeURIComponent(ReturnUrl))
+						location.href = url + '?otc_ader_id=' + data.otc_ader_id + '&otc_transac_id=' + data.otc_transac_id +
+							'&order_number=' + order_number + '&otc_ad_account_type=' + otc_ad_account_type+'&return_url='+encodeURIComponent(ReturnUrl);
+					}
+				})
+			}
+
+			function createListener (data) {
+				$('.create').on('click', function () {
+					var index = $('.create').index($(this));
+					otc_ad_id = data.list[index].otc_ad_id;
+
+					if (OrderType === 2) {
+						if (payInfo && payment === payInfo.pay) {
+							var info = {};
+							info[payInfo.pay] = [payInfo.account_info]
+							createOrder(info);
+							return
+						} else {
+							$('.wrapper').show();
+							$('.' + formName).show();
+							return;
+						}
+					}
+					createOrder();
+				})
+			}
+
+			function ajax2(query) {
+				$('.blackP').show()
+				//遮罩层
+				$('#list, #page').hide()
+				$('#list').html('');
+				GLOBAL.ajax({
+					url: '/web/view/otc_ad/coin_name/' + CoinName + '/type/' + OrderType + query + '&order_number=' + order_number,
+					method: 'get',
+					data: {},
+					success: function (data) {
+						//遮罩层
+						if (payment.indexOf(query)) {
+							setTimeout(function () {
+								if (data.list.length > pageSize){
+									$('#page').show();
+								} 
+								$('.blackP').hide()
+								$('#list').show()
+							}, 1000)
+						}
+
+						$('#background-block').hide();
+						if (!data.list.length) {
+							return $('#nodata-block').show();
+						} else {
+							$('#nodata-block').hide();
+						}
+
+						showLI(data.list.slice((page-1)*pageSize, page*pageSize));
+
+						$("#page").paging({
+							pageNo: page,
+							totalPage: Math.ceil( data.list.length / 4 ),
+							totalSize: data.list.length,
+							callback: function(num) {
+								showLI(data.list.slice((num-1)*pageSize, num*pageSize))
+								createListener(data)
+							}
+						})
+
+						//默认跳第一条
+						if (OrderType === 1) {
+							otc_ad_id = data.list[0].otc_ad_id;
+							return createOrder()
+						}
+						// 
+						createListener(data);
+						
+					}
+				})
+			}
+
+			function showLI (data) {
+				$('#list').html('');
+				var fragment = document.createDocumentFragment();
+				var tr = document.createElement('li');
+
+				data.forEach(function (v, i) {
+				if (v.otc_ad_status === 1) {
+					var tr_clone = $(tr).clone();
+					tr_clone.html(
+						'<div>' +
+						'<div class="li-left"><h3>' + v.otc_ader_name + '</h3><p>出售数量： ' + v.available_amount + ' ' + v.coin_name +
+						'</p>' +
+						'<p>限额：' + v.mix_limit + '-' + v.max_limit + ' CNY</p>' +
+						'<p><span>支付方式：</span>' + (v.is_alipay === 2 ? '<i class="icon aly-pay"></i>' : '') +
+						(v.is_wechatpay === 2 ? '<i class="icon wx-pay"></i>' : '') +
+						(v.is_bank === 2 ? '<i class="icon yh-pay"></i>' : '') +
+						(v.is_paypal === 2 ? '<i class="icon pay-pay"></i>' : '') +
+						'</p>' +
+						'</div>' +
+						'<div class="li-right"><p><span class="rmb">￥</span><span class="number li-coin-price">' + Number((v.currency_margin +
+							100) * single_price / 100).toFixed(2) + '</span></p><button class="btn create" type="button">' + (
+							OrderType === 1 ? '购买' : '出售') + '</button></div>' +
+						'</div>'
+					)
+					$(fragment).append(tr_clone);
+				}
+			})
+			$('#list').append($(fragment));
+
+			}
+
+			GLOBAL.loading.show();
+			getOrder();
+			timer_price = setInterval(function () {
+				getCoin(CoinName, function (data) {
+					var el = $('.li-coin-price');
+					if (!el.length) return;
+					el.map(function (v, i) {
+						var innerPrice = $(i).html();
+						$(i).html(Number(innerPrice / single_price * data[CoinName]).toFixed(2))
+					});
+				})
+			}, 180000);
+
+
+			//如果有提币的未完成的记录直接跳详情
+			GLOBAL.ajax({
+				url: '/web/view/otc_ader/order/' + order_number,
+				method: 'get',
+				success: function (data) {
+					if (data && data.otc_transac_type == 2) {
+						if (data.otc_transac_status == 1 || data.otc_transac_status == 2) {
+							hideWrap();
+							var url = 'otc_sell.html'
+							console.log(url + '?otc_ader_id=' + data.otc_ader_id + '&otc_transac_id=' + data.otc_transac_id +
+								'&order_number=' + order_number + '&otc_ad_account_type=' + otc_ad_account_type)
+							location.href = url + '?otc_ader_id=' + data.otc_ader_id + '&otc_transac_id=' + data.otc_transac_id +
+								'&order_number=' + order_number + '&otc_ad_account_type=' + otc_ad_account_type+'&return_url='+encodeURIComponent(ReturnUrl);
+						}
+					}
+
+				}
+
+			})
+		})
+	</script>
+	<script type="text/javascript" src="js/interceptor.js"></script>
+</body>
+
+</html>
