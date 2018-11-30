@@ -1,8 +1,9 @@
 
-# gulp静态资源压缩
+## gulp静态资源压缩
 
-# config.json 配置
+## config.json 配置
 
+```
 #  // 打包路径
 #  "path": "./dist",
 #  // 需要压缩的css目录
@@ -17,7 +18,11 @@
 #  "cssBrowsers": ["last 10 versions", "last 3 Safari versions", "last 10 Explorer versions", "Firefox >= 15", "> 1%", "ie 8", "ie 7"],
 #  // 静态直接复制的目录
 #  "scp": ["./config"]
+```
 
+## Build Setup
+
+``` bash
 # npm install
 
 # // 运行
